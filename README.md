@@ -19,15 +19,25 @@ What will this page / lesson teach?
 > Stenography with JPG/JPEG/PNG image formats
 
 > How to hide files / ZIP files inside of JPEG / JPG formats with go 
+
 > How to base64 encode a paylaod 
+
 > How to hide a base64 encoded payload into a JPG file 
+
 > How to filter out and execute the payload in the image from a post forum
+
 > How to inject data into images with EXIF-Hunter
+
 > How to find the binary offsets and chunk types using EXIF hunter 
+
 > How to find chunk offsets in PNG images by yourself
+
 > How to Geo locate and understand geo location tags in JPG/JPEG image formats 
+
 > How to extract metadata out of image files using EXIFTOOL
+
 > How to EXTRACT ZIP files using EXIF-Hunter 
+
 > How to build your own GO script to extract ZIP files in JPG/JPEG image formats
 
 Wow alot right? thats alright it should not take that long, by the end of this reading you should be able to understand how stenography works, and how to build your own scripts in go to automate the skills you learned here, just like the fortran95 lesson on math see this link here -> https://github.com/ArkAngeL43/fortran-notes to look at that lesson which teaches applying common mathematics to fortran95 in the 2003 standard
