@@ -15,7 +15,9 @@ Alot of people for a while now in my server and on my pages like the fortran pag
 What will this page / lesson teach?
 
 > How stenography works
+ 
 > Stenography with JPG/JPEG/PNG image formats
+
 > How to hide files / ZIP files inside of JPEG / JPG formats with go 
 > How to base64 encode a paylaod 
 > How to hide a base64 encoded payload into a JPG file 
