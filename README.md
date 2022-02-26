@@ -84,7 +84,8 @@ import (
     "io"
 )
 
-func run(filename string) {  
+func main() {
+    filename := os.Args[1]  
     f, err := os.Open(filename)
     if err != nil {
         log.Fatal(err)
@@ -102,11 +103,6 @@ func run(filename string) {
         }
         fmt.Printf("%s", hex.Dump(buf))
     }
-}
-
-func main() {
-  file := os.Args
-  run(file)
 }
 ```
 
