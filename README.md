@@ -97,3 +97,15 @@ func main() {
   run(file)
 }
 ```
+
+this script is easy to work with, simple save the file as main.go, and run it as go run main.go yourimage.png
+
+for this example i will be using the image below 
+
+**image**
+
+![im](git/battlecat.png)
+
+
+
+
