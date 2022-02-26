@@ -119,5 +119,4 @@ for this example i will be using the image below
 ![im](git/battlecat.png)
 
 
-
-
+we will run the script as follows *go run main.go battlecat.png* when we run the tool we will get the output of a large hex and example is seen down below at the very top of the hex dump.
