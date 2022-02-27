@@ -1,13 +1,11 @@
 # EXIF-Stegonography-and-image-injection
 
 ```
-
-   ___            __ _                                         _           
-  / _ \___       / _\ |_ ___ _ __   ___   __ _ _ __ __ _ _ __ | |__  _   _ 
- / /_\/ _ \ _____\ \| __/ _ \ '_ \ / _ \ / _` | '__/ _` | '_ \| '_ \| | | |
-/ /_\\ (_) |_____|\ \ ||  __/ | | | (_) | (_| | | | (_| | |_) | | | | |_| |
-\____/\___/      \__/\__\___|_| |_|\___/ \__, |_|  \__,_| .__/|_| |_|\__, |
-                                         |___/          |_|          |___/
+ _____         _____ _                                       _       
+|   __|___ ___|   __| |_ ___ ___ ___ ___ ___ ___ ___ ___ ___| |_ _ _ 
+|  |  | . |___|__   |  _| -_| . | . |   | . | . |  _| .'| . |   | | |
+|_____|___|   |_____|_| |___|_  |___|_|_|___|_  |_| |__,|  _|_|_|_  |
+                            |___|           |___|       |_|     |___|
 ```
 
 Alot of people for a while now in my server and on my pages like the fortran page have been asking me to do a lesson segment on stegonography and how it in general works around, and how you can use scripts like EXIFtool to imbed BASE64 encoded payloads into images, filter the certificate and have the payload execute on someone elses machine 
