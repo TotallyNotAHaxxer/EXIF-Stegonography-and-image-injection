@@ -315,4 +315,153 @@ Why would this be better than sending or making someone execute malicous EXE fil
 
 Now to start off with this whole zip file injection as said above i am going to teach you the simple part of injecting data like ZIP files and extracting ZIP files from JPG/JPEG images with the power of go to really get you familiar with hiding data in images 
 
+
 > Locating and extracting ZIP files from JPG images
+
+This will be quite simple to understand because this process through the line of code is quite easy and quite simple to understand, below this text is an example of a script written by an anonomoys poster in my old old old discord server which is not alive, which prooves the concept that you can search for ZIP files in images via hex code and extract them 
+
+```go
+ackage main
+
+import (
+	"bufio"
+	"bytes"
+	"fmt"
+	"log"
+	"os"
+	"os/exec"
+	"strings"
+	"syscall"
+)
+
+func usage(name string) {
+	fmt.Fprintf(os.Stdout, "Usage:\t%v file.jpg\n", name)
+	fmt.Printf("Detecting a ZIP archive in a JPEG image\n")
+	fmt.Printf("For unarchiving you need 7z\n")
+	os.Exit(1)
+}
+
+func main() {
+	// usage
+	if len(os.Args) == 1 || os.Args[1] == "-h" {
+		usage(os.Args[0])
+	}
+
+	fileJpg := os.Args[1]
+
+	if !strings.HasSuffix(fileJpg, "jpg") {
+		usage(os.Args[0])
+	}
+
+	// Zip signature is "\x50\x4b\x03\x04"
+	file, err := os.Open(fileJpg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	bufferedReader := bufio.NewReader(file)
+	fileStat, _ := file.Stat()
+	// 0 is being cast to an int64 to force i to be initialized as
+	// int64 because filestat.Size() returns an int64 and must be
+	// compared against the same type
+	for i := int64(0); i < fileStat.Size(); i++ {
+		myByte, err := bufferedReader.ReadByte()
+		if err != nil {
+			log.Fatal(err)
+		}
+		if myByte == '\x50' {
+			// First byte match. Check the next 3 bytes
+			byteSlice := make([]byte, 3)
+			// Get bytes without advancing pointer with Peek
+			byteSlice, err = bufferedReader.Peek(3)
+			if err != nil {
+				log.Fatal(err)
+			}
+			if bytes.Equal(byteSlice, []byte{'\x4b', '\x03', '\x04'}) {
+				log.Printf("Found zip signature at byte %d.", i)
+			}
+		}
+	}
+
+	// Unzip it
+	for {
+		var unz string
+		fmt.Print("Unzip it? (Y/N) > ")
+		_, err := fmt.Scanf("%s", &unz)
+		if err != nil {
+			fmt.Println("Wrong data")
+			continue
+		}
+		switch {
+		case unz == "Y":
+			fmt.Println("OK")
+
+			// where 7z
+			binary, err := exec.LookPath("/usr/bin/7z")
+			if err != nil {
+				log.Fatalln(err)
+			}
+
+			// args
+			args := []string{"7z", "e", os.Args[1]}
+
+			env := os.Environ()
+
+			err = syscall.Exec(binary, args, env)
+			if err != nil {
+				log.Fatalln(err)
+			}
+
+		case unz == "N":
+			fmt.Println("OK")
+			fmt.Println("Exit")
+			os.Exit(0)
+		default:
+			fmt.Println("Wrong data")
+			continue
+		}
+	}
+
+}
+```
+
+this is 103 lines of code its not too much to chop down when you have the main core, so let me explain this a bit better for you, the top function is the main function which takes image formats as the arguments or image paths anyway, then it checks if the argument containes JPG and if it does it continues, after that in the notes it says 
+
+`Zip signature is "\x50\x4b\x03\x04"` remmeber how i talked about how you can verify an image is an image by reading its header bytes? ZIP files are structured the same way with headers, a certian part of their files the header declares that the ZIP is well a ZIP file, lets look at the main function of this script is 
+
+```go
+	for i := int64(0); i < fileStat.Size(); i++ {
+		myByte, err := bufferedReader.ReadByte()
+		if err != nil {
+			log.Fatal(err)
+		}
+		if myByte == '\x50' {
+			// First byte match. Check the next 3 bytes
+			byteSlice := make([]byte, 3)
+			// Get bytes without advancing pointer with Peek
+			byteSlice, err = bufferedReader.Peek(3)
+			if err != nil {
+				log.Fatal(err)
+			}
+			if bytes.Equal(byteSlice, []byte{'\x4b', '\x03', '\x04'}) {
+				log.Printf("Found zip signature at byte %d.", i)
+			}
+		}
+	}
+```
+
+this is the one we want to pay attention to, when we look at the script it uses golangs pointers and standard filestat to read the byte of the file, if the byte is equal to \x50 then there is a possibility of it being a zip file, but just to be sure it reads for the next 3 bytes after that to verify this is a zip header or ZIP file, hence the 
+
+```go
+if bytes.Equal(byteSlice, []byte{'\x4b', '\x03', '\x04'}) {
+				log.Printf("Found zip signature at byte %d.", i)
+}
+```
+
+if the byte is equal to the slice and the byte array then it returns as it follows, once done it will ask the user if it wants to use 7z to unpack and unzip the file archive
+
+im going to walk through the input and output for this script, so in the filepath zip_utils you will find two things, a file passwords.txt and a image names image.jpg, this will be what i will be using for this input, the image will be image.jpg and the file we will be extracting will be passwords.txt, the image below is the one i will be using 
+
+
+
+
+
