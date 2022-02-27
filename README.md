@@ -1048,7 +1048,7 @@ Certificate                     : emVuaXR5IC0tbm90aWZpY2F0aW9uIC0tdGV4dD0iV0FSTk
 
 our injected image is the same but now has the payload 
 
-![im](zip_utils/injected.jpg)
+![im](git/injected.jpg)
 
 
 this means our code is now injected into the image, now lets make a simple command to filter and execute this data
