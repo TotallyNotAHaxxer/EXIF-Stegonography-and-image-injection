@@ -190,6 +190,129 @@ which once run you will get a large table and be asked `Would you like to locate
 
 now that we have all the offset and enough knowlege to grab the offset we can now inject our data into the image.
 
-> Injecting data 
+> Injecting data into PNG images
 
-Im going to start this section off by saying sorry XD, the last section was very very disorganized so to coninue into this one im going to explain some things i missed, the most important was EXIF-Hunter, if you dont know EXIF-Hunter is a image injection tool, payload encoder, meta data miner, geo location, and ZIP extraction utility for image formats of JPG/JPEG and PNG. This tool can aid in terms or lessons like this by helping you extract the meta data like chunks, chunk offsets, encoding payloads, and retrieving ZIP files embedded into images. Another thing i missed was 
+Im going to start this section off by saying sorry XD, the last section was very very disorganized so to coninue into this one im going to explain some things i missed, the most important was EXIF-Hunter, if you dont know EXIF-Hunter is a image injection tool, payload encoder, meta data miner, geo location, and ZIP extraction utility for image formats of JPG/JPEG and PNG. This tool can aid in terms or lessons like this by helping you extract the meta data like chunks, chunk offsets, encoding payloads, and retrieving ZIP files embedded into images. 
+
+Now lets start off this section properly instead of sub starting it by explaining what exactly is image injection, and why is this specifcally built around certian image formats. So lets put this into an example, say you wanted to use EXIF-Hunter to inject payloads into a image that is like JPG, and that data is a command or malicous code block. Well you will simply get the error `this is not a valid PNG image format` that is because the script is built specifically to seak out certian bytes that specify to only png image formats. remmeber when i was saying that each image has its own way of representing data and that each image has its own form of magic bytes? EXIF hunter was built specifically to seak the data inside of PNG image formats only and in cases like the code below 
+
+```go
+
+func (mc *MetaChunk) validate(b *bytes.Reader) {
+	var header Header
+
+	if err := binary.Read(b, binary.BigEndian, &header.Header); err != nil {
+		log.Fatal(err)
+	}
+
+	bArr := make([]byte, 8)
+	binary.BigEndian.PutUint64(bArr, header.Header)
+
+	if string(bArr[1:4]) != "PNG" {
+		log.Fatal("Provided file is not a valid PNG format")
+	} else {
+		fmt.Println(RED, "[INFO] ", BLU, formatDate, RED, " -> ", bArr[1:4], " Came back as a VALID HEADER")
+	}
+}
+```
+
+it is built to read specific data in image formats, as seen in `bArr[1:4]` which seeks out the header of the PNG dump, when it finds it it can now verify that the image is a PNG image, and that well we can move forward with the image injection, and that data can properly be processed and set into a certian offset in the image.
+
+In order to inject our PNG we need the original image, the offset, the chunk type, and the payload. lets start by making our data to inject, in order for us to read it and for it to be properly injected fully we need to base64 encode it, so to do that we will use the following command 
+
+`printf 'echo "hello world"' | base64 | tr -d '\n'`
+
+when we decode the payload you get `ZWNobyAiaGVsbG8gd29ybGQi` this is our payload to inject, for this side i will be using EXIF hunter you can use the tool of your choice since this section is rather just about injecting PNG's instead of injection JPG images with ZIP files or malicous code. 
+
+if you use EXIF hunter you use the following command to inject 
+
+`go run main.go -i battlecat.png -o injected.png --inject --offset 0x85258 --payload "ZWNobyAiaGVsbG8gd29ybGQi"` 
+
+ -i specifies the input image 
+ -o specified the output image
+ --inject starts injection 
+ --offset is the location we will inject 
+ --payload is out payload we will inject
+ 
+ once we enter the command and everything is correct we will get the following output 
+ 
+ 2 giant white EXIF tables ( Ignore that )
+ 
+ and two messages which thrown together say the following 
+ 
+ ```
+ [INFO]   07:21:44   -> File Exists 	 battlecat.png
+ [INFO]   07:21:44   -> Opening file   	 battlecat.png
+ [INFO]   07:21:44   ->  battlecat.png 	 Successfully opened
+ [INFO]   07:21:44   ->  [80 78 71]  Came back as a VALID HEADER
+ [INFO]   07:21:44   -> Payload Original -> [90 87 78 111 98 121 65 105 97 71 86 115 98 71 56 103 100 50 57 121 98 71 81 105]
+ [INFO]   07:21:44   -> Payload          -> [90 87 78 111 98 121 65 105 97 71 86 115 98 71 56 103 100 50 57 121 98 71 81 105]
+ [INFO]   07:21:44   -> Success injecting, created file    	 injected.png
+ [INFO]   07:21:44   -> Reading and dumping new file
+ ```
+ 
+ we get general information that the file exists, it opening the file, if it failed or not, if the header came back valid as PNG, payload byte code, and if it was successful dumping 
+ 
+ when we use the other option in EXIF hunter to now check to see if our data is injected we look at the end and see 
+ 
+ ```
+ 00000050  39 fb bc 9c 92 47 d4 4d  00 00 00 18 72 4e 44 6d  |9....G.M....rNDm|
+00000060  5a 57 4e 6f 62 79 41 69  61 47 56 73 62 47 38 67  |ZWNobyAiaGVsbG8g|
+00000070  64 32 39 79 62 47 51 69  2b c1 67 2d 00 00 00 00  |d29ybGQi+.g-....|
+00000080  49 45 4e 44 ae 42 60 82  1f a7 b3 4f 35 ba e3 a5  |IEND.B`....O5...|
+00000090  4b 97 fc 8e 1e 3d 1a 74  e8 d0 a1 30 32 f6 ef df  |K....=.t...02...|
+000000a0  1f ba 7b eb ee 60 fc 9e  87 83 bc 77 c7 8e 1d a1  |..{..`.....w....|
+000000b0  7b f7 ee 0d 21 af 25 ef  f1 b5 c7 f5 b9 06 46 c8  |{...!.%.......F.|
+000000c0  19 18 18 18 18 18 18 18  18 fe ab 49 bb af bd df  |...........I....|
+000000d0  e3 70 03 42 6f 5c b9 a1  3b 77 ee 5c da 0f 67 ce  |.p.Bo\..;w.\..g.|
+000000e0  14 9e 3e 7d 7a ec 77 df  7d 5f 71 fa f4 d9 d2 b3  |..>}z.w.}_q.....|
+000000f0  67 cf e5 60 e2 6c be 79  f3 66 b8 8f 6d 60 87 ff  |g..`.l.y.f..m`..|
+ ```
+ 
+ if you look at hex and and hash table the meta data we can see our offset has now changed 
+ 
+ ```
++------------+----------+-----------------+---------------------+-----------------+
+|     Offset |    Chunk |    Chunk Number |    Chunk Importance |    Chunk Length |
++============+==========+=================+=====================+=================+
+|    0x8527c |     IEND |              20 |            Critical |               0 |
++------------+----------+-----------------+---------------------+-----------------+
+ ```
+ 
+ and that our encoded string is now in there
+ 
+ ```
+ 00000060  5a 57 4e 6f 62 79 41 69  61 47 56 73 62 47 38 67  |ZWNobyAiaGVsbG8g|
+ 00000070  64 32 39 79 62 47 51 69  2b c1 67 2d 00 00 00 00  |d29ybGQi+.g-....|
+ 00000080  49 45 4e 44 ae 42 60 82  1f a7 b3 4f 35 ba e3 a5  |IEND.B`....O5...|
+ ```
+ 
+ 
+ Now that we can easily inject images, and understand the basics of stenography lets move to the more advanced side
+ 
+ # injecting, understanding, and extracting data out of JPEG/JPG image formats 
+ 
+ I believe i am still not through the basics yet so before we get to the final part of this lesson i will be teaching you how to look for and extract ZIP files, and inject ZIP files into JPG image formats, this can be a bit easier to understand since this is just hiding data into the image with the OS, and extracting data by finding the very specific header of the type of file. Now when it comes to JPEG lets all admit to a person they are the most dangerous images to have, this is dangerous because of a few small things im going to list off 
+ 
+ > JPEG/JPG images have whats called GEOlocation tags inside of them, which can tell a hacker or stalker the exact location of where the photo was taken based off of its cordinants, ( i made a function in EXIF-Tool to trace the location and write a map to it which we will discuss later )
+
+> They are easy to inject data into and have people execute payloads, with the way JPEG certificates work, it makes it easy for someone to install a backdoor or virus or malicous payload into the image and execute it upon filtering out that data in the certificate
+
+> They are easy to manipulate into viruses 
+
+> They give out MUCH more information on the device used in that image and the person who took the photo 
+
+> They give out a stronger structure for hackers to easily manipulate into trackers which can act as links upon opening the image.
+
+
+Why would this be better than sending or making someone execute malicous EXE files or ELF files if they are on linux.
+
+1: WAF Evasion, `With commercial software like Fortinet's FortiGate firewall, each packet can be thoroughly dissected for analysis. These kinds of firewalls make it difficult for an attacker using simple TCP connections established with Netcat to persist on the compromised device or covertly map the network.`, the use of images along with tools to inject and hide the payloads in the images,  make it difficult for system administration to montior traffic and classify it as malicous
+
+2: Packet sniffing evasion: In most corperate enviroments operating systems or servers are configured to use custom certificates which make it quite possible for a network admin to decrypt the data coming in and out from devices on the current network. 
+
+3: AV Evasion: Anti virus systems are built to read the data of the binary, executable, or file, if it seaks out something dangerous such as a form of shellcode in a binary or ascii dump then it will trigger which on systems like windows wont continue downloading the data until the user presses or accepts the possibility to hit ok and have the program continue. With certian *Stagers* it gives you're program more protection to bypass AV software. 
+
+Now to start off with this whole zip file injection as said above i am going to teach you the simple part of injecting data like ZIP files and extracting ZIP files from JPG/JPEG images with the power of go to really get you familiar with hiding data in images 
+
+> Locating and extracting ZIP files from JPG images
