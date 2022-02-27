@@ -465,3 +465,144 @@ im going to walk through the input and output for this script, so in the filepat
 ![im](zip_utils/stego_image.jpg)
 
 
+when we run the script we will be running it as follows 
+
+`go run main.go stego_image.jpg`
+
+we will get the following output 
+
+`2022/02/27 08:20:43 Found zip signature at byte 135275.`
+
+well since we found the byte, lets see if we can hex dump it to pre see the files inside of that ZIP file 
+
+```
+00000080  00 0c 00 00 00 0d 00 00  00 70 61 73 73 77 6f 72  |.........passwor|
+00000090  64 73 2e 74 78 74 61 6c  6f 68 61 62 61 62 79 31  |ds.txtalohababy1|
+000000a0  32 33 50 4b 01 02 3f 03  0a 03 00 00 00 00 b2 84  |23PK..?.........|
+000000b0  55 4d 5b ce b7 14 0c 00  00 00 0c 00 00 00 0d 00  |UM[.............|
+000000c0  24 00 00 00 00 00 00 00  20 80 b4 81 00 00 00 00  |$....... .......|
+000000d0  70 61 73 73 77 6f 72 64  73 2e 74 78 74 0a 00 20  |passwords.txt.. |
+000000e0  00 00 00 00 00 01 00 18  00 00 d0 27 3a 43 69 d4  |...........':Ci.|
+000000f0  01 00 ef 31 34 43 69 d4  01 00 d0 27 3a 43 69 d4  |...14Ci....':Ci.|
+00000000  01 50 4b 05 06 00 00 00  00 01 00 01 00 5f 00 00  |.PK.........._..|
+00000010  00 37 00 00 00 00 00 74  09 29 86 9f 43 aa 40 cb  |.7.....t.)..C.@.|
+00000020  3f a0 d4 78 17 59 ab 15  fc 48 a9 33 d7 e8 69 33  |?..x.Y...H.3..i3|
+00000030  cc 8e 09 59 fd 8b d4 17  37 37 26 dd 87 cd 52 07  |...Y....77&...R.|
+00000040  42 57 8c 40 f7 02 f1 60  19 ea 3c 90 61 bc b0 52  |BW.@...`..<.a..R|
+00000050  33 e5 bc 46 49 4f 17 11  ed 47 58 6f 47 7e c5 1e  |3..FIO...GXoG~..|
+00000060  dd a7 aa 9b 3d e3 9a 3d  7f ff d9 50 4b 03 04 0a  |....=..=...PK...|
+00000070  03 00 00 00 00 b2 84 55  4d 5b ce b7 14 0c 00 00  |.......UM[......|
+00000080  00 0c 00 00 00 0d 00 00  00 70 61 73 73 77 6f 72  |.........passwor|
+00000090  64 73 2e 74 78 74 61 6c  6f 68 61 62 61 62 79 31  |ds.txtalohababy1|
+000000a0  32 33 50 4b 01 02 3f 03  0a 03 00 00 00 00 b2 84  |23PK..?.........|
+000000b0  55 4d 5b ce b7 14 0c 00  00 00 0c 00 00 00 0d 00  |UM[.............|
+000000c0  24 00 00 00 00 00 00 00  20 80 b4 81 00 00 00 00  |$....... .......|
+000000d0  70 61 73 73 77 6f 72 64  73 2e 74 78 74 0a 00 20  |passwords.txt.. |
+000000e0  00 00 00 00 00 01 00 18  00 00 d0 27 3a 43 69 d4  |...........':Ci.|
+000000f0  01 00 ef 31 34 43 69 d4  01 00 d0 27 3a 43 69 d4  |...14Ci....':Ci.|
+```
+
+when we hex dump it and track to the very very VERY end of the long hex dump we can see the `passwords.txt` file, and some other weird symbols, in the case we do not want to extract it we can always see what is in the file to see what is in there, this can help more or less on the blue team to see what is in there in case if that zip file becomes a zip bomb and is like an implant to extract it 
+
+> Injecting ZIP files 
+
+Now that we understand the basics of how the file is found and the basics of bytes in stenography, i will now teach you the basics of injecting a file or ZIP file into a JPG file
+
+to do this we will need another script like the following
+
+```
+package main
+
+import (
+	"fmt"
+	"io"
+	"log"
+	"os"
+	"strings"
+)
+
+func main() {
+	// usage
+	if len(os.Args) == 1 || os.Args[1] == "-h" {
+		fmt.Fprintf(os.Stdout, "Usage:\t%v file.jpg file.zip\n", os.Args[0])
+		fmt.Printf("Create a hidden archive into new jpg\n")
+		os.Exit(1)
+	}
+
+	fileJpg := os.Args[1]
+	fileZip := os.Args[2]
+
+	if !strings.HasSuffix(fileJpg, "jpg") || !strings.HasSuffix(fileZip, "zip") {
+		fmt.Fprintf(os.Stdout, "Usage:\t%v file.jpg file.zip\n", os.Args[0])
+		fmt.Printf("Create a hidden archive into new jpg\n")
+		os.Exit(1)
+	}
+
+	// Open original file
+	firstFile, err := os.Open(fileJpg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer firstFile.Close()
+	// Second file
+	secondFile, err := os.Open(fileZip)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer secondFile.Close()
+	newFile, err := os.Create("hidden_data_in_image.jpg")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer newFile.Close()
+	_, err = io.Copy(newFile, firstFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = io.Copy(newFile, secondFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Finished injection")
+}
+```
+
+Now in this case this is actually more copying or hiding an archive in a image or behind an image more than injection but same concept, so in the simplist form this code takes two os argument vec's, one to input the file you want to implant the file into and the zip file, for this case i will be simply using the same image as the one we used to find the zip file, when we run the program we get a silent output, we have it first open and read the file, then open the ZIP file to make sure both the image and ZIP file are all there and real. then you create the output image file which is our choice to name ( In EXIF hunter i added the option to change the output name with the -o tag ) then we can use Golangs base IOUTIL lib to merge the files together basically melting them and mixing the data together which is why when you hex dump it it becomes very very very wacky to look at and there isnt as organized of an output like we did see in the png image fortmat.
+
+if you really wanted to test to see if the zip file was truly injected you can take the ZIP scan file and run your new output file through the scanner which if all is okay with no error or warning output then the file should be in there 
+
+# Getting to the good part 
+
+I know i did not do the best in explaining exactly how this works but i hope it helped a little, this is the part where people became curious, while the common concept of stenography is an easy concept to grasp on the tip of the iceburg it gets a little bias the deeper you go, alot of people claim as i have seen before and heard that you can not execute remote code without exploiting the program that opens the image or you need to inject raw code into the image which both are all very very wrong, we can proof this concept through a simple POC kinda like how EXIF-Hunter is the proof of concept of stenography and using it to both defend your systems and comprimise other peoples or ofc get image data.
+
+for this we will not be using my own tools since EXIF hunter is still in dveelopment and has some bugs as well as its better to use other tools like EXIF-Tool to make this process a fuck ton easier 
+
+This time we will be injecting a base64 encoded payload, uploading it to a web forum which does not execute the process of EXIF data sanitization, and executing the code using curl from the command line to filter out the data in the JPEG certificate 
+
+Warnings: ---------------------------------------------
+
+This lesson was not meant to tell you how to comprimise systems for your own good but understand how you can use images to attack systems to possibly come up with your own platforms to help aid upcoming pentesters. Also, there is something cool i just thought you can do with this, when we further talk about making the curl request and filtering out the image certificate, if you truly wanted to get into a server, this can be useful for remote code injection or os command injection,( its a concept i have not tested myself and probobly will soon and proof that its quite real )
+
+`so my concept is, if you find a server vulnerable to OS command injection then you can inject a CURL command to make a request to the image forum and filter out the malicous code in the image on the server side `
+
+anyway lets get into this, so lets get real, im going to make a command which will make a noise and alert the user you have been hacked 
+
+this is the command 
+
+`zenity --notification --text="WARNING: YOU HAVE BEEN HACKED :D DIE DIE DIE DIE DIE" --title="TIME IS UP FUCKERRRR" ; echo -en "\007"`
+
+this is a simple command which will call the pre install utility zenity to spawn a notification telling the user they have been haked, at the end use the echo -en code to echo a bell hexidecimal the `\007` is an equivelant to using `\b` or the `bell tag` i think its the a but either way it makes a bell sound kinda more like a pop 
+
+ANYWAY 
+
+we need to base 64 encode this so lets do so 
+
+`printf 'zenity --notification --text="WARNING: YOU HAVE BEEN HACKED :D DIE DIE DIE DIE DIE" --title="TIME IS UP FUCKERRRR" ; echo -en "\007"' | base64 | tr -d '\n'`
+
+once done our base 64 encoded string is 
+
+`emVuaXR5IC0tbm90aWZpY2F0aW9uIC0tdGV4dD0iV0FSTklORzogWU9VIEhBVkUgQkVFTiBIQUNLRUQgOkQgRElFIERJRSBESUUgRElFIERJRSIgLS10aXRsZT0iVElNRSBJUyBVUCBGVUNLRVJSUlIiIDsgZWNobyAtZW4gIgci`
+
+now this image injection is simple but lets go through the EXIF data that we get, the image i will be using is the same jpg image that we used for the ZIP injection and extraction. 
+
+when we use `exiftool` to dump the data we get the following output `(DISCLAIMER: Since i knew perl to a good amount i decided for the EXIF part of EXIF-Hunter i would use the simple perl lib EXIFTOOL which was writtin in perl and for perl, this is the one installed in most linux systems, the table and data output is not standard by the tool as the table seen below in the example output was using EXIF-Hunter's perl script to wrap a ASCII table around the data)`
