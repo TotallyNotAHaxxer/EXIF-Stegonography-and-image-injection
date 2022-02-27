@@ -462,6 +462,6 @@ if the byte is equal to the slice and the byte array then it returns as it follo
 im going to walk through the input and output for this script, so in the filepath zip_utils you will find two things, a file passwords.txt and a image names image.jpg, this will be what i will be using for this input, the image will be image.jpg and the file we will be extracting will be passwords.txt, the image below is the one i will be using 
 
 
-
+![im](zip_utils/stego_image.jpg)
 
 
