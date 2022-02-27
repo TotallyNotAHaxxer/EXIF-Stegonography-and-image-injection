@@ -14,9 +14,9 @@ Alot of people for a while now in my server and on my pages like the fortran pag
 
 What will this page / lesson teach?
 
-> How stenography works
+> How stegonography works
  
-> Stenography with JPG/JPEG/PNG image formats
+> stegonography with JPG/JPEG/PNG image formats
 
 > How to hide files / ZIP files inside of JPEG / JPG formats with go 
 
@@ -44,9 +44,9 @@ Wow alot right? thats alright it should not take that long, by the end of this r
 
 # Starting out with the basics 
 
-> What is stenography? 
+> What is stegonography? 
 
-Stenography is a process hackers or in some cases organizations use to hide data inside of images, this can be something as small as an encrypted or base64 encoded message to someone, or something as big as a data leak and ZIP file which can execute remote code or holds very very important data. in most cases hackers or digital forensics experts will use stenography to encode and inject malicous payloads like the rubber ducky payload into images to gain remote access to a computer 
+Stegonography is a process hackers or in some cases organizations use to hide data inside of images, this can be something as small as an encrypted or base64 encoded message to someone, or something as big as a data leak and ZIP file which can execute remote code or holds very very important data. in most cases hackers or digital forensics experts will use stegonography to encode and inject malicous payloads like the rubber ducky payload into images to gain remote access to a computer 
 
 > How can this aid hackers in attacks and how is this better than normal malware?
 
@@ -58,14 +58,14 @@ While it seems that easy it is a dreadful long process, we wont be necessarily d
 
 > The basics of PNG images 
 
-On this repo i will be teaching you how to use or make your own tools to inject data into JPG formats, but something to understand first will be the basics of stenography, to do this i will be giving you a basic understanding of how PNG files can be injected and how you can manually as well as using my own tools to find the chunk types, and offsets in PNG images.
+On this repo i will be teaching you how to use or make your own tools to inject data into JPG formats, but something to understand first will be the basics of stegonography, to do this i will be giving you a basic understanding of how PNG files can be injected and how you can manually as well as using my own tools to find the chunk types, and offsets in PNG images.
 
 
 # Understanding, injecting, and finding chunks in png image formats 
 
 > Locating offsets, and chunks
 
-There is a long process of understanding to stenography with images, its not super super long but it can go deep especially given there are so much different forms of stenography along with image formats. To start this topic off we will be talking about the metadata / recon part of stenography which is quite fairly easy, all you need is a PNG image, and a hex dumping utility. Hex dumping is amazing for this kind of stuff because it allows you to find certian data and filter it out, as well as finding chunk type offsets.
+There is a long process of understanding to stegonography with images, its not super super long but it can go deep especially given there are so much different forms of stegonography along with image formats. To start this topic off we will be talking about the metadata / recon part of stenography which is quite fairly easy, all you need is a PNG image, and a hex dumping utility. Hex dumping is amazing for this kind of stuff because it allows you to find certian data and filter it out, as well as finding chunk type offsets.
 
 **Building your own command line interface hex dumping utility**
 
